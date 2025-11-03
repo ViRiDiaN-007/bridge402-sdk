@@ -1,0 +1,34 @@
+{
+  "name": "@bridge402/sdk",
+  "version": "1.0.0",
+  "description": "Bridge402 SDK for easy integration of news WebSocket streams",
+  "main": "src/index.js",
+  "type": "module",
+  "keywords": [
+    "bridge402",
+    "websocket",
+    "crypto",
+    "news",
+    "x402",
+    "solana",
+    "base"
+  ],
+  "author": "Bridge402",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "ws": "^8.18.0",
+    "undici": "^6.20.0",
+    "@solana/web3.js": "^1.95.8",
+    "@solana/spl-token": "^0.4.9"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.7"
+  },
+  "files": [
+    "src/**/*"
+  ]
+}
+
