@@ -1,15 +1,23 @@
 # Bridge402 SDK
 
-Easy integration for Bridge402 news WebSocket streams. Connect to real-time crypto news feeds with automatic payment handling and session management.
+Easy integration for Bridge402 services. Connect to real-time crypto news feeds, extract structured content from web pages, and access earnings transcripts with automatic payment handling.
 
 ## Features
 
+### News WebSocket Streams
 - ✅ **Automatic Payment Handling** - x402 payments with Solana
 - ✅ **Auto-Renewal** - Sessions automatically extend before expiry
 - ✅ **Webhook Support** - Forward messages to Discord, custom webhooks, etc.
 - ✅ **Retry Logic** - Handles facilitator failures gracefully
 - ✅ **Event-Driven** - Simple event-based API
-- ✅ **TypeScript Ready** - Full type support
+
+### Diffbot Content Extraction
+- ✅ **Article Extraction** - Extract structured article content
+- ✅ **Product Extraction** - Extract product information
+- ✅ **Discussion Extraction** - Extract forum/thread content
+- ✅ **Image Extraction** - Extract primary images with metadata
+- ✅ **Batch Processing** - Extract multiple URLs efficiently
+- ✅ **Auto-Payment** - Automatic x402 payment handling
 
 ## Installation
 
@@ -67,6 +75,43 @@ client.on('message', (msg) => {
 });
 
 await client.start();
+```
+
+### Diffbot Extraction Example
+
+```javascript
+import { DiffbotClient } from '@bridge402/sdk';
+import { Keypair } from '@solana/web3.js';
+
+// Load your wallet
+const wallet = Keypair.fromSecretKey(/* your keypair */);
+
+// Create Diffbot client
+const client = new DiffbotClient({
+  wallet: wallet,
+  baseUrl: 'https://bridge402.tech',
+  network: 'sol' // or 'base'
+});
+
+// Extract article
+const result = await client.extractArticle('https://example.com/article');
+console.log('Article:', result.data.objects[0]);
+
+// Extract product
+const product = await client.extractProduct('https://example.com/product');
+
+// Extract discussion
+const discussion = await client.extractDiscussion('https://example.com/forum');
+
+// Extract images
+const images = await client.extractImage('https://example.com/gallery');
+
+// Batch extract multiple URLs
+const results = await client.batchExtract('article', [
+  'https://example.com/article1',
+  'https://example.com/article2',
+  'https://example.com/article3'
+]);
 ```
 
 ## API Reference
@@ -162,6 +207,83 @@ client.on('closed', (data) => {
 });
 ```
 
+### DiffbotClient
+
+Main client class for extracting structured content from web pages using Diffbot.
+
+#### Constructor Options
+
+```javascript
+{
+  wallet: Keypair,              // Required: Solana wallet/keypair
+  baseUrl: string,              // Optional: API URL (default: https://bridge402.tech)
+  solanaRpc: string,            // Optional: Solana RPC URL
+  network: string,              // Optional: 'sol' or 'base' (default: 'sol')
+  retryAttempts: number,        // Optional: Retry attempts (default: 3)
+  solUsdcMint: string,          // Optional: USDC mint address
+  facilitatorUrl: string        // Optional: Facilitator URL
+}
+```
+
+#### Methods
+
+**`extractArticle(url)`**
+Extract article content from a URL.
+
+```javascript
+const result = await client.extractArticle('https://example.com/article');
+// Returns: { extractionType, url, data, payment, metadata }
+```
+
+**`extractProduct(url)`**
+Extract product information from a URL.
+
+```javascript
+const result = await client.extractProduct('https://example.com/product');
+```
+
+**`extractDiscussion(url)`**
+Extract discussion/forum content from a URL.
+
+```javascript
+const result = await client.extractDiscussion('https://example.com/forum');
+```
+
+**`extractImage(url)`**
+Extract primary images from a URL.
+
+```javascript
+const result = await client.extractImage('https://example.com/gallery');
+// Returns array of image objects with metadata (url, dimensions, tags, etc.)
+```
+
+**`batchExtract(type, urls)`**
+Extract multiple URLs in batch.
+
+```javascript
+const results = await client.batchExtract('article', [
+  'https://example.com/article1',
+  'https://example.com/article2'
+]);
+// Returns: [{ url, success: true, data }, ...]
+```
+
+#### Events
+
+**`extraction`** - Extraction completed
+```javascript
+client.on('extraction', ({ type, url, result }) => {
+  console.log(`Extracted ${type} from ${url}`);
+});
+```
+
+**`error`** - Error occurred
+```javascript
+client.on('error', (error) => {
+  console.error('Error:', error);
+});
+```
+
 ### Message Formatters
 
 #### DiscordFormatter
@@ -196,9 +318,13 @@ class MyFormatter extends MessageFormatter {
 
 See the `examples/` directory:
 
+### News WebSocket Examples
 - **`websocket-connection.js`** - WebSocket connection example (handles messages directly)
 - **`discord-webhook.js`** - Discord webhook integration
 - **`basic-usage.js`** - Basic usage without webhooks
+
+### Diffbot Extraction Examples
+- **`diffbot-usage.js`** - Diffbot extraction examples (article, product, discussion, batch)
 
 ### WebSocket Connection Example
 
@@ -223,6 +349,19 @@ export DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/..."
 
 # Run example
 node examples/discord-webhook.js
+```
+
+### Diffbot Extraction Example
+
+Extract structured content from web pages:
+
+```bash
+# Set environment variables
+export KEYPAIR_PATH="path/to/keypair.json"
+export BASE_URL="https://bridge402.tech"
+
+# Run example
+node examples/diffbot-usage.js
 ```
 
 ## Message Format
